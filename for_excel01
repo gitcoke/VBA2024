@@ -1,0 +1,50 @@
+Option Explicit
+
+Sub GenerateEmail()
+    Dim OutlookApp As Object
+    Dim OutlookMail As Object
+    Dim MailBody As String
+    Dim Recipient As String
+    Dim Subject As String
+    Dim Body As String
+    Dim Variable1 As String
+    Dim Variable2 As String
+    Dim i As Integer
+    
+    ' Outlook のインスタンスを作成
+    Set OutlookApp = CreateObject("Outlook.Application")
+    Set OutlookMail = OutlookApp.CreateItem(0)
+    
+    ' 変数の数を取得
+    Dim LastRow As Integer
+    LastRow = ThisWorkbook.Sheets("make_mail").Cells(Rows.Count, "A").End(xlUp).Row - 1 ' シート名を適切な名前に変更する
+    
+    ' 変数の数だけ繰り返し
+    For i = 1 To LastRow
+        ' 変数を取得
+        Variable1 = ThisWorkbook.Sheets("make_mail").Cells(i + 1, 5).Value ' シート名を適切な名前に変更する
+        Variable2 = ThisWorkbook.Sheets("make_mail").Cells(i + 1, 6).Value ' シート名を適切な名前に変更する
+        
+        ' 定型文を取得
+        Recipient = ThisWorkbook.Sheets("make_mail").Cells(i + 1, 1).Value ' シート名を適切な名前に変更する
+        Subject = ThisWorkbook.Sheets("make_mail").Cells(i + 1, 2).Value ' シート名を適切な名前に変更する
+        Body = ThisWorkbook.Sheets("make_mail").Cells(i + 1, 3).Value ' シート名を適切な名前に変更する
+        
+        ' メール本文に変数を置換
+        MailBody = Replace(Body, "{Variable1}", Variable1)
+        MailBody = Replace(MailBody, "{Variable2}", Variable2)
+        
+        ' メールを作成
+        With OutlookMail
+            .To = Recipient
+            .Subject = Subject
+            .Body = MailBody
+            .Display ' メールを表示する場合は .Display を使い、直接送信する場合は .Send を使う
+        End With
+    Next i
+    
+    ' Outlook のオブジェクトを解放
+    Set OutlookMail = Nothing
+    Set OutlookApp = Nothing
+End Sub
+
